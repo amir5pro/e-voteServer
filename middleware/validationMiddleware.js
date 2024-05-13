@@ -47,3 +47,27 @@ export const validateAdminLoginInput = validationErrors([
     .withMessage("invalid email format"),
   body("password").trim().notEmpty().withMessage("password is required"),
 ]);
+
+export const validateAdminUpdateInput = validationErrors([
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8 characters long"),
+]);
+
+export const validateDate = validationErrors([
+  body("start")
+    .trim()
+    .notEmpty()
+    .withMessage("Start date is required")
+    .isISO8601()
+    .withMessage("Invalid  date format.Use ISO8601 format (YYYY-MM-DD)"),
+  body("end")
+    .trim()
+    .notEmpty()
+    .withMessage("End date is required")
+    .isISO8601()
+    .withMessage("Invalid  date format .Use ISO8601 format (YYYY-MM-DD)"),
+]);

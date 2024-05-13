@@ -1,4 +1,4 @@
-import { UnauthenticatedError } from "../errors/customErrors.js";
+import { UnauthenticatedError } from "../errors/customError.js";
 import { verifyJWT } from "../utils/tokenUtils.js";
 export const authenticateUser = (req, res, next) => {
   const { token } = req.cookies;

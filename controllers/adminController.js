@@ -1,8 +1,10 @@
 import {
   BadRequestError,
   UnauthenticatedError,
+  UnauthorizedError,
 } from "../errors/customError.js";
 import Admin from "../models/adminModel.js";
+import Dates from "../models/dateModel.js";
 import { StatusCodes } from "http-status-codes";
 import { comparePassword, hashPassword } from "../utils/passwordUtils.js";
 import { createToken } from "../utils/tokenUtils.js";
@@ -43,6 +45,68 @@ export const login = async (req, res) => {
 };
 
 export const updateInfo = async (req, res) => {
-  console.log(req.user);
-  res.send("ffffffffff");
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+  const hashedPassword = await hashPassword(req.body.password);
+
+  const updated = await Admin.findByIdAndUpdate(req.user.userId, {
+    password: hashedPassword,
+  });
+
+  res.status(StatusCodes.OK).json({ msg: "password successfully updated" });
+};
+
+export const setPreliminaryVotingDates = async (req, res) => {
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+  const { start, end } = req.body;
+  let date = await Dates.findOne({ name: "preliminaryVoteDate" });
+  if (!date) {
+    date = await Dates.create({ name: "preliminaryVoteDate", start, end });
+  } else {
+    date.start = start;
+    date.end = end;
+    await date.save();
+  }
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "successfully added preliminary voting date" });
+};
+export const setVoterRegistrationDates = async (req, res) => {
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+
+  const { start, end } = req.body;
+  let date = await Dates.findOne({ name: "voterRegistrationDate" });
+  if (!date) {
+    date = await Dates.create({ name: "voterRegistrationDate", start, end });
+  } else {
+    date.start = start;
+    date.end = end;
+    await date.save();
+  }
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "successfully added voter registration date" });
+};
+export const setMainVotingDates = async (req, res) => {
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+
+  const { start, end } = req.body;
+  let date = await Dates.findOne({ name: "mainVotingDate" });
+  if (!date) {
+    date = await Dates.create({ name: "mainVotingDate", start, end });
+  } else {
+    date.start = start;
+    date.end = end;
+    await date.save();
+  }
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "successfully added main voting date" });
 };
