@@ -1,4 +1,4 @@
-import { validationResult, body } from "express-validator";
+import { validationResult, param, body } from "express-validator";
 import mongoose from "mongoose";
 import { BadRequestError } from "../errors/customError.js";
 
@@ -62,12 +62,60 @@ export const validateDate = validationErrors([
     .trim()
     .notEmpty()
     .withMessage("Start date is required")
+    .bail()
     .isISO8601()
     .withMessage("Invalid  date format.Use ISO8601 format (YYYY-MM-DD)"),
   body("end")
     .trim()
     .notEmpty()
     .withMessage("End date is required")
+    .bail()
     .isISO8601()
     .withMessage("Invalid  date format .Use ISO8601 format (YYYY-MM-DD)"),
+]);
+
+export const validateAddStudentInput = validationErrors([
+  body("name")
+    .trim()
+    .notEmpty()
+    .withMessage("name is required")
+    .matches(/^[A-Za-z\s]+$/)
+    .withMessage("Name must only contain letters."),
+  body("studentId")
+    .trim()
+    .notEmpty()
+    .withMessage("Student ID is required")
+    .isNumeric()
+    .withMessage("Student ID must only contain numbers")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("Student ID must be 6 digits "),
+  body("gender")
+    .notEmpty()
+    .withMessage("Gender is required")
+    .isIn(["male", "female"])
+    .withMessage("Invalid gender"),
+]);
+
+export const validateIdParam = validationErrors([
+  param("id").custom(async (value, { req }) => {
+    const isValidId = mongoose.Types.ObjectId.isValid(value);
+    if (!isValidId) throw new Error("invalid MongoDB id");
+  }),
+]);
+
+export const validateVoterInput = validationErrors([
+  body("studentId")
+    .trim()
+    .notEmpty()
+    .withMessage("Student ID is required")
+    .isNumeric()
+    .withMessage("Student ID must only contain numbers")
+    .isLength({ min: 6, max: 6 })
+    .withMessage("Student ID must be 6 digits "),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8 characters long"),
 ]);

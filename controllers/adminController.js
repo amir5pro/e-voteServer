@@ -1,5 +1,6 @@
 import {
   BadRequestError,
+  NotFoundError,
   UnauthenticatedError,
   UnauthorizedError,
 } from "../errors/customError.js";
@@ -8,6 +9,7 @@ import Dates from "../models/dateModel.js";
 import { StatusCodes } from "http-status-codes";
 import { comparePassword, hashPassword } from "../utils/passwordUtils.js";
 import { createToken } from "../utils/tokenUtils.js";
+import Student from "../models/studentModel.js";
 
 export const register = async (req, res) => {
   const { email } = req.body;
@@ -109,4 +111,31 @@ export const setMainVotingDates = async (req, res) => {
   res
     .status(StatusCodes.OK)
     .json({ msg: "successfully added main voting date" });
+};
+
+export const addStudent = async (req, res) => {
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+  const { studentId } = req.body;
+  const existingStudent = await Student.findOne({ studentId });
+
+  if (existingStudent) {
+    throw new BadRequestError("student id already exists!");
+  }
+
+  await Student.create(req.body);
+  res.status(StatusCodes.CREATED).json({ msg: "student added successfully" });
+};
+
+export const deleteStudent = async (req, res) => {
+  if (req.user.role !== "admin") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+
+  const student = await Student.findById(req.params.id);
+  if (!student) throw new NotFoundError(`no student found`);
+
+  await Student.findByIdAndDelete(req.params.id);
+  res.status(StatusCodes.OK).json({ msg: "student deleted successfully" });
 };
