@@ -14,6 +14,8 @@ const app = express();
 // routes
 import adminRouter from "./routes/adminRouter.js";
 import studentRouter from "./routes/studentRouter.js";
+import candidateRouter from "./routes/candidateRouter.js";
+import logoutRouter from "./routes/logoutRouter.js";
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -24,6 +26,8 @@ app.use(cookieParser());
 
 app.use("/api/admin", adminRouter);
 app.use("/api/student", studentRouter);
+app.use("/api/candidate", candidateRouter);
+app.use("/api/logout", logoutRouter);
 
 app.use("*", (req, res) => {
   res.status(404).json({ msg: "not found" });

@@ -103,7 +103,7 @@ export const validateIdParam = validationErrors([
   }),
 ]);
 
-export const validateVoterInput = validationErrors([
+export const validateStudentInput = validationErrors([
   body("studentId")
     .trim()
     .notEmpty()
@@ -118,4 +118,32 @@ export const validateVoterInput = validationErrors([
     .withMessage("password is required")
     .isLength({ min: 8 })
     .withMessage("password must be at least 8 characters long"),
+]);
+
+export const validateCandidateInput = validationErrors([
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("email is required")
+    .isEmail()
+    .withMessage("invalid email format"),
+  body("phone")
+    .trim()
+    .notEmpty()
+    .withMessage("phone-number  is required")
+    .isNumeric()
+    .withMessage("phone-number must only contain numbers"),
+  body("Age")
+    .trim()
+    .notEmpty()
+    .withMessage("Age is required")
+    .isNumeric()
+    .withMessage("Age must be  number"),
+  body("Department")
+    .trim()
+    .notEmpty()
+    .withMessage("Department is required")
+    .matches(/^[A-Za-z\s]+$/)
+    .withMessage("Department must only contain letters."),
+  body("Campaign").trim().notEmpty().withMessage("Campaign is required"),
 ]);

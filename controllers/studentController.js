@@ -252,4 +252,39 @@ export const getStats = async (req, res) => {
   ) {
     throw new BadRequestError("the  voting proccess isn't finished");
   }
+
+  const totalEligibleVoters = await Student.countDocuments({ role: "voter" });
+  const totalVoters = await mainVoteModel.countDocuments();
+
+  const voterBasedOnGender = await Student.aggregate([
+    {
+      $match: {
+        gender: { $in: ["male", "female"] }, // Filter students with gender either "male" or "female"
+      },
+    },
+    {
+      $lookup: {
+        from: "mainvotes",
+        localField: "_id",
+        foreignField: "voter",
+        as: "voter_info",
+      },
+    },
+    {
+      $match: {
+        voter_info: { $ne: [] }, // Filter out students who are not found in the MainVotes collection
+      },
+    },
+    {
+      $group: {
+        _id: "$gender",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+  res.status(StatusCodes.OK).json({
+    totalEligibleVoters: totalEligibleVoters,
+    totalVoters: totalVoters,
+    voterBasedOnGender: voterBasedOnGender,
+  });
 };
