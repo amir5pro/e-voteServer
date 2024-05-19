@@ -76,6 +76,22 @@ export const login = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ msg: "successfully logged in" });
 };
 
+export const getAllStudents = async (req, res) => {
+  const { name } = req.query;
+
+  let students;
+  if (name) {
+    students = await Student.find({ name: { $regex: new RegExp(name, "i") } });
+  } else {
+    students = await Student.find({});
+  }
+
+  if (students.length === 0) {
+    throw new NotFoundError("No students found");
+  }
+
+  res.status(StatusCodes.OK).json({ students: students });
+};
 export const preliminaryVote = async (req, res) => {
   const voterId = req.user.userId;
 

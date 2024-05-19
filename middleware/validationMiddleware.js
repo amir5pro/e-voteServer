@@ -45,7 +45,12 @@ export const validateAdminLoginInput = validationErrors([
     .withMessage("email is required")
     .isEmail()
     .withMessage("invalid email format"),
-  body("password").trim().notEmpty().withMessage("password is required"),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 8 })
+    .withMessage("password must be at least 8 characters long"),
 ]);
 
 export const validateAdminUpdateInput = validationErrors([

@@ -135,7 +135,9 @@ export const deleteStudent = async (req, res) => {
 
   const student = await Student.findById(req.params.id);
   if (!student) throw new NotFoundError(`no student found`);
-
+  if (student.role === "candidate") {
+    throw new BadRequestError("you cannot delete a candidate");
+  }
   await Student.findByIdAndDelete(req.params.id);
   res.status(StatusCodes.OK).json({ msg: "student deleted successfully" });
 };
