@@ -264,7 +264,7 @@ export const getStats = async (req, res) => {
 
   if (
     !mainVotingDate ||
-    currentDate <= mainVotingDate.end.toISOString().split("T")[0]
+    currentDate < mainVotingDate.end.toISOString().split("T")[0]
   ) {
     throw new BadRequestError("the  voting proccess isn't finished");
   }
