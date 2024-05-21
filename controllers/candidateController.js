@@ -10,6 +10,8 @@ import { comparePassword } from "../utils/passwordUtils.js";
 import { createToken } from "../utils/tokenUtils.js";
 import candidiateModel from "../models/candidiateModel.js";
 import Dates from "../models/dateModel.js";
+import { formatImage } from "../middleware/multerMIddleware.js";
+import cloudinary from "cloudinary";
 
 const currentDate = new Date().toISOString().split("T")[0];
 
@@ -79,4 +81,29 @@ export const getCandidateInfo = async (req, res) => {
   }
 
   res.status(StatusCodes.OK).json({ candidateInfo: candidateInfo });
+};
+
+export const addPhoto = async (req, res) => {
+  if (req.user.role !== "candidate") {
+    throw new UnauthorizedError("you aren't authorized");
+  }
+
+  const candidate = await candidiateModel.findOne({
+    candidateId: req.user.userId,
+  });
+  if (req.file && candidate.avatarPublicId) {
+    await cloudinary.v2.uploader.destroy(candidate.avatarPublicId);
+  }
+
+  if (req.file) {
+    const file = formatImage(req.file);
+    const response = await cloudinary.v2.uploader.upload(file);
+    candidate.avatar = response.secure_url;
+    candidate.avatarPublicId = response.public_id;
+  }
+
+  await candidate.save();
+  res
+    .status(StatusCodes.OK)
+    .json({ msg: "Candidate photo added successfully" });
 };

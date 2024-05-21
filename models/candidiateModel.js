@@ -11,6 +11,8 @@ const CandidateSchema = new mongoose.Schema({
   Age: String,
   Department: String,
   Campaign: String,
+  avatar: String,
+  avatarPublicId: String,
 });
 
 export default mongoose.model("Candidate", CandidateSchema);
