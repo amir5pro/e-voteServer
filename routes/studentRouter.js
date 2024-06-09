@@ -15,8 +15,15 @@ import {
   validateStudentInput,
 } from "../middleware/validationMiddleware.js";
 import { authenticateUser } from "../middleware/authMiddleware.js";
-router.post("/register", validateStudentInput, register);
-router.post("/login", validateStudentInput, login);
+import rateLimiter from "express-rate-limit";
+
+const apiLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15,
+  message: { msg: "IP rate limit exceeded, retry in 15 minutes." },
+});
+router.post("/register", apiLimiter, validateStudentInput, register);
+router.post("/login", apiLimiter, validateStudentInput, login);
 router.get("/allStudents", authenticateUser, getAllStudents);
 router.post("/prevote/:id", authenticateUser, validateIdParam, preliminaryVote);
 router.get("/candidates", authenticateUser, getCandidates);

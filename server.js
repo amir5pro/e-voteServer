@@ -6,6 +6,8 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -31,6 +33,8 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(helmet());
+app.use(mongoSanitize());
 
 app.use("/api/admin", adminRouter);
 app.use("/api/student", studentRouter);

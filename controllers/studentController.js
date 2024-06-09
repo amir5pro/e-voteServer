@@ -121,7 +121,7 @@ export const preliminaryVote = async (req, res) => {
   const student = await Student.findById(id);
 
   if (!student || student.registered === false) {
-    throw new NotFoundError("selected student not found");
+    throw new NotFoundError("selected student is not  registered");
   }
 
   await preliminaryVoteModel.create({
