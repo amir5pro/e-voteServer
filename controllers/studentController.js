@@ -250,7 +250,14 @@ export const getResult = async (req, res) => {
       .status(StatusCodes.NOT_FOUND)
       .json({ message: "No candidates with votes found." });
   }
-
+  for (const candidate of candidatesWithVotes) {
+    const student = await Student.findOne({ _id: candidate.candidateId });
+    if (student) {
+      candidate.studentDetails = student.studentId;
+    } else {
+      candidate.studentDetails = null;
+    }
+  }
   const totalVotesCount = await mainVoteModel.countDocuments();
   res
     .status(StatusCodes.OK)
