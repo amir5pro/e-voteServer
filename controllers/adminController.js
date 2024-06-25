@@ -36,14 +36,10 @@ export const login = async (req, res) => {
     throw new UnauthenticatedError("invalid credentials");
   }
   const token = createToken({ userId: admin._id, role: admin.role });
-  const oneDay = 1000 * 60 * 60 * 24;
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
-    secure: process.env.NODE_ENV === "production",
-  });
-  res.status(StatusCodes.CREATED).json({ msg: "successfully logged in" });
+  res
+    .status(StatusCodes.CREATED)
+    .json({ msg: "successfully logged in", dataToken: token });
 };
 
 export const updateInfo = async (req, res) => {
